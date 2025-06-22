@@ -1,0 +1,102 @@
+services:
+  # FastAPI Backend Service
+  fastapi:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./shared:/app/shared
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=debug
+      - PYTHONPATH=/app
+      - CHROMADB_HOST=chromadb
+      - CHROMADB_PORT=8000
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - chromadb
+      - redis
+    networks:
+      - rag_network
+    restart: unless-stopped
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  # ChromaDB Vector Database (Development)
+  chromadb:
+    image: ghcr.io/chroma-core/chroma:latest
+    ports:
+      - "8001:8000"
+    volumes:
+      - chromadb_data:/chroma/chroma
+    environment:
+      - CHROMA_SERVER_HOST=0.0.0.0
+      - CHROMA_SERVER_HTTP_PORT=8000
+    networks:
+      - rag_network
+    restart: unless-stopped
+
+  # Redis for Celery Task Queue
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - rag_network
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+
+  # Celery Worker for Async Processing
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend:/app
+      - ./shared:/app/shared
+      - .:/workspace
+    environment:
+      - ENVIRONMENT=development
+      - LOG_LEVEL=debug
+      - PYTHONPATH=/app:/workspace
+      - CHROMADB_HOST=chromadb
+      - CHROMADB_PORT=8000
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+      - chromadb
+    networks:
+      - rag_network
+    restart: unless-stopped
+    command: sh -c "cd /workspace && celery -A celery_worker worker --loglevel=info"
+
+  # Celery Flower for Task Monitoring
+  flower:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5555:5555"
+    volumes:
+      - .:/workspace
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - PYTHONPATH=/workspace
+    depends_on:
+      - redis
+    networks:
+      - rag_network
+    restart: unless-stopped
+    command: sh -c "cd /workspace && celery -A celery_worker flower --port=5555"
+
+networks:
+  rag_network:
+    driver: bridge
+
+volumes:
+  chromadb_data:
+  redis_data: 

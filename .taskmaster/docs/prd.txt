@@ -1,0 +1,195 @@
+<context>
+# Overview  
+The project aims to engineer a highly accurate, responsive, and user-friendly knowledge base system for interacting with complex technical PDF documents. This system will function as an intelligent assistant for engineers, researchers, and technical staff, enabling them to query dense documentation using natural language and receive precise, context-aware answers.
+
+The primary goal is to develop a production-grade Retrieval-Augmented Generation (RAG) application that leverages state-of-the-art open-source components to deliver a seamless and trustworthy question-answering experience.
+
+# Core Features  
+## Data Ingestion Pipeline
+- Robust PDF parsing capable of handling structural complexity of technical documents
+- Advanced, context-aware chunking strategy tailored for technical content
+- Asynchronous processing with task queue management
+- Metadata enrichment for source attribution and filtering
+
+## RAG Backend System
+- Qwen/Qwen3-Embedding-8B embedding model for high-quality text representations
+- Vector database with dual-environment support (Milvus for production, Chroma for development)
+- Multi-stage retrieval pipeline with reranking for precision
+- Qwen/Qwen2-7B-Instruct generation model for final answer synthesis
+
+## Web Application Interface
+- React/Next.js frontend with Gemini-like chat interface
+- Real-time streaming responses
+- Session management and searchable chat history
+- Source attribution and verification features
+- Mobile-responsive design
+
+## Enterprise Features
+- RESTful API with clear endpoint specifications
+- Containerized microservices architecture
+- Kubernetes deployment for production scalability
+- Authentication and security compliance
+
+# User Experience  
+## User Personas
+- Engineers and researchers working with technical documentation
+- Technical staff requiring quick access to complex PDF content
+- Enterprise users needing verifiable, source-attributed answers
+
+## Key User Flows
+- Upload PDF documents through web interface
+- Ask natural language questions about document content
+- Receive streaming responses with source citations
+- Browse and search conversation history
+- Verify answers by accessing original document sources
+
+## UI/UX Considerations
+- Clean, minimalist design modeled after Google Gemini
+- Improved usability with searchable history (addressing Gemini's known issues)
+- Rich content display with Markdown, LaTeX, and code highlighting
+- Mobile-first responsive design approach
+</context>
+<PRD>
+# Technical Architecture  
+## System Components
+### Microservices Architecture
+- **Ingestion Service**: PDF upload endpoint with unstructured.io parsing
+- **Processing Pipeline**: Asynchronous Celery workers for chunking and embedding
+- **Vector Database**: Milvus (production) / Chroma (development) for vector storage
+- **RAG API Backend**: FastAPI service orchestrating retrieval and generation
+- **Frontend Application**: React/Next.js with lobe-chat framework integration
+
+### Data Models
+- **Document Chunks**: Vector embeddings with rich metadata schema
+- **Chat Sessions**: Conversation history and session management
+- **Processing Jobs**: Asynchronous task tracking and status
+
+### APIs and Integrations
+- RESTful API endpoints for document upload, chat, and history
+- Streaming response capabilities for real-time user experience
+- Integration with Qwen model family via sentence-transformers
+- LlamaIndex and LangChain framework integration
+
+### Infrastructure Requirements
+- **Development**: Docker Compose with ChromaDB and quantized models
+- **Production**: Kubernetes with Milvus, GPU node pools for model inference
+- **Storage**: Vector database persistence and document storage
+- **Security**: Authentication, secrets management, vulnerability scanning
+
+# Development Roadmap  
+## Phase 1: Core Infrastructure (MVP)
+### Foundation Services
+- Set up development environment with Docker Compose
+- Implement basic FastAPI backend structure
+- Configure ChromaDB for local development
+- Create basic document upload endpoint
+- Implement simple PDF text extraction
+
+### Basic RAG Pipeline
+- Integrate Qwen/Qwen3-Embedding-8B model
+- Implement basic chunking strategy
+- Create vector storage and retrieval logic
+- Build simple chat endpoint with Qwen/Qwen2-7B-Instruct
+- Basic response generation without reranking
+
+## Phase 2: Advanced Processing
+### Sophisticated Document Processing
+- Implement unstructured.io for complex PDF parsing
+- Develop multi-pass chunking strategy (structural, element-type, recursive)
+- Add metadata enrichment with complete schema
+- Implement asynchronous processing with Celery
+- Add job status tracking and monitoring
+
+### Enhanced RAG Pipeline
+- Integrate Qwen/Qwen3-Reranker-8B for improved precision
+- Implement two-stage retrieval (initial + reranking)
+- Add advanced metadata filtering capabilities
+- Optimize prompt engineering for generation model
+- Implement streaming response functionality
+
+## Phase 3: Frontend Development
+### Chat Interface Foundation
+- Fork and customize lobe-chat framework
+- Implement basic chat UI with Gemini-like design
+- Add session management functionality
+- Create document upload interface
+- Implement real-time streaming display
+
+### Advanced UI Features
+- Add searchable chat history with filtering
+- Implement source attribution display
+- Create rich content rendering (Markdown, LaTeX, code)
+- Add response regeneration controls
+- Implement mobile-responsive design
+
+## Phase 4: Production Readiness
+### Scalability and Performance
+- Implement Milvus for production vector storage
+- Set up Kubernetes deployment manifests
+- Add horizontal scaling for API and workers
+- Implement caching strategies for performance
+- Load testing and optimization
+
+### Security and Compliance
+- Implement authentication and authorization
+- Set up secrets management system
+- Add API rate limiting and security headers
+- Implement audit logging
+- Security scanning and compliance documentation
+
+# Logical Dependency Chain
+## Foundation First (Critical Path)
+1. **Development Environment Setup** - Docker, basic services, local database
+2. **Basic API Structure** - FastAPI backend, core endpoints, basic error handling
+3. **Model Integration** - Qwen embedding and generation models, basic inference
+4. **Simple RAG Pipeline** - Basic chunking, vector storage, retrieval, generation
+
+## Incremental Enhancement Path
+5. **Advanced Document Processing** - Sophisticated parsing, multi-pass chunking
+6. **Enhanced Retrieval** - Reranking, metadata filtering, precision optimization
+7. **Frontend Foundation** - Basic chat interface, session management
+8. **Rich UI Features** - Advanced display, history search, source attribution
+
+## Production Path
+9. **Asynchronous Processing** - Celery workers, job queuing, status tracking
+10. **Production Database** - Milvus integration, scalability testing
+11. **Deployment Infrastructure** - Kubernetes, CI/CD, monitoring
+12. **Security and Compliance** - Authentication, secrets, security scanning
+
+# Risks and Mitigations  
+## Technical Challenges
+- **GPU Resource Requirements**: Mitigate with quantized models for development, cloud GPU for production
+- **Complex PDF Parsing**: Leverage proven unstructured.io library, fallback strategies
+- **Vector Database Scalability**: Dual-database strategy (Chroma/Milvus) for different environments
+- **Model Compatibility**: Use Qwen family models for consistency, Apache 2.0 licensing
+
+## Implementation Risks
+- **Framework Integration Complexity**: Start with LlamaIndex core, add LangChain incrementally
+- **Performance Requirements**: Implement streaming early, optimize retrieval pipeline
+- **UI/UX Complexity**: Leverage lobe-chat foundation, focus on customization not rebuilding
+
+## Resource Constraints
+- **Development Hardware**: Docker Compose with lightweight models for local development
+- **Production Costs**: Kubernetes auto-scaling, efficient model serving strategies
+- **Timeline Management**: Phased approach with working MVP early, incremental enhancement
+
+# Appendix  
+## Technology Stack Summary
+- **PDF Parsing**: unstructured.io for complex document structure handling
+- **RAG Framework**: LlamaIndex (core) with LangChain (extensibility)
+- **Models**: Qwen/Qwen3-Embedding-8B, Qwen/Qwen3-Reranker-8B, Qwen/Qwen2-7B-Instruct
+- **Vector Store**: Milvus (production), Chroma (development)
+- **Backend**: FastAPI with Celery for async processing
+- **Frontend**: React/Next.js with lobe-chat framework
+- **Deployment**: Docker, Kubernetes, CI/CD with GitHub Actions
+
+## Reference Projects
+- **RAGFlow**: Architectural reference for deep document understanding
+- **Cognita**: Microservices pattern for production RAG systems
+- **lobe-chat**: Open-source foundation for chat interface
+
+## Licensing Compliance
+- All Qwen models use Apache 2.0 license (commercial-friendly)
+- Open-source component attribution required in NOTICE file
+- Regular vulnerability scanning for dependencies
+</PRD> 

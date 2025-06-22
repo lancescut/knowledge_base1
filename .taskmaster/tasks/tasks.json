@@ -1,0 +1,481 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Setup Development Environment",
+      "description": "Configure Docker Compose for local development with ChromaDB and basic services.",
+      "details": "Create a Docker Compose file with services for FastAPI backend, ChromaDB, and Celery workers. Use lightweight versions of services for local development. Include environment variables for configuration.",
+      "testStrategy": "Verify all services start correctly and are accessible within the Docker network.",
+      "priority": "high",
+      "dependencies": [],
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Configure FastAPI service",
+          "description": "Set up the FastAPI service in Docker Compose with necessary configurations such as ports, volumes, and environment variables.",
+          "dependencies": [],
+          "details": "Define the FastAPI service in the docker-compose.yml file, including the base image, exposed ports, mounted volumes, and any required environment variables.\n<info added on 2025-06-21T14:32:50.009Z>\nThe FastAPI service is fully configured and ready for development. Implemented a comprehensive docker-compose.yml with FastAPI, ChromaDB, Redis, Celery worker, and Flower monitoring. Set up Dockerfile with Python 3.11 base image and all necessary dependencies. Created requirements.txt with all RAG system dependencies. Developed the FastAPI application structure, including main.py with app setup, CORS, exception handling, health check endpoints, document upload/management, and chat endpoints. Configured services with appropriate ports and environment variables, ensuring connectivity via Docker network and readiness for Kubernetes.\n</info added on 2025-06-21T14:32:50.009Z>",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "title": "Configure ChromaDB service",
+          "description": "Set up the ChromaDB service in Docker Compose, ensuring it is properly linked to the FastAPI service if needed.",
+          "dependencies": [
+            1
+          ],
+          "details": "Add the ChromaDB service to the docker-compose.yml file, specifying the image, ports, and any dependencies on the FastAPI service.\n<info added on 2025-06-21T14:35:28.093Z>\nChromaDB service has been successfully configured in the docker-compose.yml file with the official ghcr.io/chroma-core/chroma:latest image, exposed on port 8001, and utilizing a persistent data volume (chromadb_data). It is connected to rag_network for service communication and includes environment variables for host and port configuration. A comprehensive ChromaDB service module has been created, featuring a ChromaDBService class with full CRUD operations, async initialization, methods for adding documents and searching for similarities, collection management, health check functionality, and robust error handling. The service has been integrated into the main FastAPI application with proper lifespan management and graceful degradation. The configuration supports cosine similarity for vector search, automatic collection creation, full metadata support, and includes logging for monitoring and debugging. ChromaDB service is fully operational and ready for vector operations.\n</info added on 2025-06-21T14:35:28.093Z>",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "title": "Configure Celery workers with Redis",
+          "description": "Set up Celery workers and Redis in Docker Compose, ensuring they are properly linked to the FastAPI service.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Define the Celery and Redis services in the docker-compose.yml file, including the necessary configurations for task queues and result backends.\n<info added on 2025-06-21T14:39:04.343Z>\nCelery workers with Redis have been fully configured and are operational. The implementation includes a comprehensive Celery worker application, a TaskService module for interfacing with FastAPI, and updates to the docker-compose.yml for correct service commands. All services are connected via rag_network, and worker monitoring is enabled through the Flower dashboard.\n</info added on 2025-06-21T14:39:04.343Z>",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Implement FastAPI Backend Structure",
+      "description": "Set up the core FastAPI application with basic endpoints and error handling. The FastAPI backend structure has been fully implemented and is production-ready.",
+      "status": "done",
+      "dependencies": [
+        1
+      ],
+      "priority": "high",
+      "details": "Create a FastAPI project with endpoints for health checks, document management, and chat functionalities. Use Pydantic for request/response models. Include middleware for CORS and error handling. Ensure proper API versioning and structured project organization.",
+      "testStrategy": "Test endpoints with Postman or curl to ensure they return expected responses. Additionally, conduct integration tests to verify the interaction between different components of the application.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Core Application Structure",
+          "status": "completed",
+          "details": "Complete FastAPI app in main.py with lifespan management, proper CORS middleware configuration, custom exception handling system, and application settings and configuration management."
+        },
+        {
+          "id": 2,
+          "title": "API Endpoints Structure",
+          "status": "completed",
+          "details": "Health check endpoints (/api/v1/health/) with system monitoring, document management endpoints (/api/v1/documents/) with upload functionality, chat endpoints (/api/v1/chat/) with streaming support, and proper API versioning with /api/v1/ prefix."
+        },
+        {
+          "id": 3,
+          "title": "Pydantic Models",
+          "status": "completed",
+          "details": "Request/response models for all endpoints, proper validation and serialization, and type hints throughout the application."
+        },
+        {
+          "id": 4,
+          "title": "Middleware & Error Handling",
+          "status": "completed",
+          "details": "CORS middleware with configurable origins, custom exception handlers for RAG-specific errors, HTTP exception handling with proper status codes, and logging integration with structured error reporting."
+        },
+        {
+          "id": 5,
+          "title": "Project Structure",
+          "status": "completed",
+          "details": "Organized package structure (api/, core/, services/), proper imports and module organization, configuration management with environment variables, and service layer pattern with dependency injection."
+        },
+        {
+          "id": 6,
+          "title": "Conduct Integration Tests",
+          "status": "done",
+          "details": "Verify the interaction between different components of the FastAPI application to ensure they work together as expected."
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Integrate Qwen Embedding Model",
+      "description": "Integrate the Qwen/Qwen3-Embedding-8B model for text embeddings. The integration is currently 90% complete, with advanced features implemented for production readiness.",
+      "status": "done",
+      "dependencies": [
+        2
+      ],
+      "priority": "high",
+      "details": "Use the sentence-transformers library to load the Qwen/Qwen3-Embedding-8B model. Implement a service to generate embeddings for text chunks. Optimize for local development with quantized models. The QwenEmbeddingService class has been created with support for both lightweight and production models, including features like CUDA memory management and batch processing.",
+      "testStrategy": "Test embedding generation with sample text and verify output dimensions. Additionally, validate the automatic model selection and ensure that health checks and error handling are functioning as expected.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Development Environment",
+          "status": "done",
+          "details": "Full Docker Compose setup with all services. FastAPI (8000), ChromaDB (8001), Redis (6379), Celery workers, Flower (5555). Production-ready containerization with proper networking."
+        },
+        {
+          "id": 2,
+          "title": "FastAPI Backend Structure",
+          "status": "done",
+          "details": "Complete API with health, documents, and chat endpoints. Pydantic models, CORS, exception handling. Service layer architecture with dependency injection."
+        },
+        {
+          "id": 3,
+          "title": "Qwen Embedding Integration",
+          "status": "done",
+          "details": "Comprehensive QwenEmbeddingService class created. Research-backed implementation with best practices. Support for both development (lightweight) and production (Qwen3-8B) models. Advanced features: quantization, batch processing, memory management. Health checks and error handling."
+        },
+        {
+          "id": 4,
+          "title": "Finalize Qwen Embedding Model Integration",
+          "status": "done",
+          "details": "Complete the remaining 10% of the Qwen embedding model integration, focusing on testing and validation of the embedding generation process."
+        },
+        {
+          "id": 5,
+          "title": "Validate Advanced Features",
+          "status": "done",
+          "details": "Ensure that the automatic model selection, CUDA memory management, and batch size optimization are functioning correctly."
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Implement Basic PDF Text Extraction",
+      "description": "Add a basic PDF text extraction endpoint using unstructured.io.",
+      "details": "Create an endpoint to upload PDFs and extract text using unstructured.io. Store extracted text temporarily for further processing. Handle common PDF parsing errors.",
+      "testStrategy": "Upload sample PDFs and verify extracted text matches the content.",
+      "priority": "medium",
+      "dependencies": [
+        2
+      ],
+      "status": "done",
+      "subtasks": []
+    },
+    {
+      "id": 5,
+      "title": "Create Simple Chunking Strategy",
+      "description": "Implement a basic text chunking strategy for RAG.",
+      "details": "Split extracted text into fixed-size chunks with overlap. Include basic metadata like document ID and chunk index. Store chunks in a temporary database.",
+      "testStrategy": "Verify chunks are correctly split and metadata is preserved.",
+      "priority": "medium",
+      "dependencies": [
+        4
+      ],
+      "status": "done",
+      "subtasks": []
+    },
+    {
+      "id": 6,
+      "title": "Set Up ChromaDB for Development",
+      "description": "Configure ChromaDB as the local vector database.",
+      "details": "Initialize ChromaDB collections for document chunks. Implement CRUD operations for embeddings and metadata. Optimize for local development performance.",
+      "testStrategy": "Test embedding storage and retrieval with sample data.",
+      "priority": "high",
+      "dependencies": [
+        3,
+        5
+      ],
+      "status": "done",
+      "subtasks": []
+    },
+    {
+      "id": 7,
+      "title": "Implement Basic Retrieval Logic",
+      "description": "Add simple vector search functionality to the RAG pipeline.",
+      "details": "Create a service to query ChromaDB for similar embeddings. Return top-k results based on cosine similarity. Include basic filtering by document ID.",
+      "testStrategy": "Test retrieval with sample queries and verify results are relevant.",
+      "priority": "high",
+      "dependencies": [
+        6
+      ],
+      "status": "done",
+      "subtasks": []
+    },
+    {
+      "id": 8,
+      "title": "Integrate Qwen Generation Model",
+      "description": "Integrate the Qwen/Qwen2-7B-Instruct model for answer generation.",
+      "details": "Use the transformers library to load the Qwen/Qwen2-7B-Instruct model. Implement a service to generate answers from retrieved chunks. Optimize prompts for technical content.",
+      "testStrategy": "Test generation with sample retrieved chunks and verify answers are coherent.",
+      "priority": "high",
+      "dependencies": [
+        2
+      ],
+      "status": "done",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Load Qwen/Qwen2-7B-Instruct model",
+          "description": "Load the Qwen/Qwen2-7B-Instruct model into the environment for use in the answer generation service.",
+          "dependencies": [],
+          "details": "Ensure the model is properly downloaded and initialized with all necessary dependencies.\n<info added on 2025-06-21T14:50:01.207Z>\nQwen2-7B-Instruct model loading implemented successfully. Created comprehensive QwenGenerationService with intelligent model selection for development and production environments. Implemented advanced features including CUDA optimization with 8-bit quantization, thread pool execution for async generation, proper tokenizer setup, device-aware initialization, robust error handling, and health checks for monitoring model status. Integrated into the main FastAPI app lifespan with graceful degradation. Key features include smart prompt engineering, memory-optimized loading, async generation, and full integration with exception handling. Service created and imported in main.py, initialized in FastAPI lifespan, and ready for answer generation pipeline.\n</info added on 2025-06-21T14:50:01.207Z>",
+          "status": "done"
+        },
+        {
+          "id": 2,
+          "title": "Implement answer generation service",
+          "description": "Develop a service that utilizes the loaded model to generate answers based on input prompts.",
+          "dependencies": [
+            1
+          ],
+          "details": "Create an API or function that takes a prompt as input and returns the model's generated response.\n<info added on 2025-06-21T14:50:34.224Z>\nAnswer generation service fully implemented and integrated!\n\nCore Service Implementation:\n- generate_answer(): Complete RAG-based generation with context integration\n  * Takes user query + retrieved document contexts\n  * Creates optimized prompts for technical Q&A\n  * Returns structured response with metadata (timing, model info, etc.)\n- generate_simple(): Direct generation for fallback scenarios\n- _create_rag_prompt(): Smart prompt engineering for technical documentation\n  * Limits contexts to avoid token overflow\n  * Provides clear instructions for context-based answering\n  * Handles multiple contexts with proper synthesis\n\nFull RAG Pipeline Integration:\n- Integrated into /api/v1/chat/ endpoint with complete pipeline:\n  1. Query embedding generation\n  2. Vector similarity search in ChromaDB\n  3. Context extraction and formatting\n  4. Answer generation with contexts\n  5. Structured response with sources and metadata\n- Error handling with graceful fallbacks\n- Performance monitoring (retrieval time, generation time, total time)\n- Source attribution with relevance scores\n\nAdvanced Features:\n- Async execution using ThreadPoolExecutor\n- Context limitation to prevent token overflow\n- Automatic fallback to direct generation when no contexts found\n- Comprehensive metadata tracking (models used, timing, chunk counts)\n- Error resilience with user-friendly error messages\n\nAPI Ready:\nThe service is fully operational and can handle real RAG queries through the FastAPI endpoints!\n</info added on 2025-06-21T14:50:34.224Z>",
+          "status": "done"
+        },
+        {
+          "id": 3,
+          "title": "Optimize prompts",
+          "description": "Refine and optimize the prompts used to generate answers to improve response quality and relevance.",
+          "dependencies": [
+            2
+          ],
+          "details": "Experiment with different prompt structures and parameters to achieve the best performance from the model.\n<info added on 2025-06-21T14:52:05.748Z>\nAdvanced prompt optimization system implemented for superior technical content generation, featuring intelligent query type detection, advanced prompt engineering, generation parameter optimization, adaptive context management, and enhanced metadata tracking. The system now generates highly optimized, contextually-aware technical responses with superior accuracy and relevance.\n</info added on 2025-06-21T14:52:05.748Z>",
+          "status": "done"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Build Simple Chat Endpoint",
+      "description": "Create a basic chat endpoint for the RAG pipeline.",
+      "details": "Combine retrieval and generation services into a single chat endpoint. Accept user queries and return generated answers. Include basic session management.",
+      "testStrategy": "Test the endpoint with sample queries and verify end-to-end functionality.",
+      "priority": "high",
+      "dependencies": [
+        7,
+        8
+      ],
+      "status": "done",
+      "subtasks": []
+    },
+    {
+      "id": 10,
+      "title": "Implement Asynchronous Processing with Celery",
+      "description": "Add Celery for asynchronous task processing.",
+      "details": "Set up Celery workers for PDF processing and embedding generation. Use Redis as the message broker. Implement task status tracking.",
+      "testStrategy": "Verify tasks are processed asynchronously and status updates are accurate.",
+      "priority": "medium",
+      "dependencies": [
+        2
+      ],
+      "status": "done",
+      "subtasks": []
+    },
+    {
+      "id": 11,
+      "title": "Enhance PDF Parsing with unstructured.io",
+      "description": "Improve PDF parsing using advanced features of unstructured.io.",
+      "details": "Leverage unstructured.io for complex PDF structures like tables and figures. Add metadata extraction for document sections. Handle nested elements recursively.",
+      "testStrategy": "Test parsing with complex PDFs and verify all elements are captured.",
+      "priority": "medium",
+      "dependencies": [
+        4
+      ],
+      "status": "done",
+      "subtasks": []
+    },
+    {
+      "id": 12,
+      "title": "Develop Multi-Pass Chunking Strategy",
+      "description": "Implement a sophisticated chunking strategy for technical content.",
+      "details": "Create a multi-pass chunking approach: structural (sections), element-type (tables, code), and recursive (nested elements). Enrich chunks with detailed metadata.",
+      "testStrategy": "Verify chunks are contextually meaningful and metadata is accurate.",
+      "priority": "medium",
+      "dependencies": [
+        11
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 13,
+      "title": "Integrate Qwen Reranker Model",
+      "description": "Add the Qwen/Qwen3-Reranker-8B model for improved retrieval precision.",
+      "details": "Implement a two-stage retrieval pipeline: initial retrieval with ChromaDB, followed by reranking with Qwen/Qwen3-Reranker-8B. Optimize for latency and accuracy.",
+      "testStrategy": "Test reranking with sample queries and verify improved relevance.",
+      "priority": "medium",
+      "dependencies": [
+        7
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 14,
+      "title": "Set Up Milvus for Production",
+      "description": "Configure Milvus as the production vector database.",
+      "details": "Deploy Milvus in a Kubernetes cluster. Implement data migration from ChromaDB. Optimize for scalability and high availability.",
+      "testStrategy": "Test retrieval performance and scalability under load.",
+      "priority": "medium",
+      "dependencies": [
+        6
+      ],
+      "status": "pending",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Deploy Milvus in Kubernetes",
+          "description": "Set up Milvus vector database within a Kubernetes cluster for production use.",
+          "dependencies": [],
+          "details": "Configure Kubernetes manifests, set up storage, and ensure proper networking for Milvus deployment.",
+          "status": "pending"
+        },
+        {
+          "id": 2,
+          "title": "Migrate data from ChromaDB",
+          "description": "Transfer existing data from ChromaDB to the newly deployed Milvus instance.",
+          "dependencies": [
+            1
+          ],
+          "details": "Develop and execute a migration script, validate data integrity post-migration, and handle any schema transformations.",
+          "status": "pending"
+        },
+        {
+          "id": 3,
+          "title": "Optimize for scalability",
+          "description": "Enhance the Milvus setup to handle increased loads and ensure horizontal scalability.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "Adjust configuration parameters, implement caching strategies, and set up monitoring for performance metrics.",
+          "status": "pending"
+        },
+        {
+          "id": 4,
+          "title": "Test under load",
+          "description": "Simulate high traffic conditions to evaluate the performance and stability of the Milvus deployment.",
+          "dependencies": [
+            1,
+            2,
+            3
+          ],
+          "details": "Design and execute load tests, analyze results, and make necessary adjustments to meet performance benchmarks.",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "title": "Fork and Customize lobe-chat Framework",
+      "description": "Set up the React/Next.js frontend using lobe-chat.",
+      "details": "Fork the lobe-chat repository and customize the UI for a Gemini-like design. Implement basic chat functionality and session management.",
+      "testStrategy": "Verify the frontend connects to the backend and displays messages correctly.",
+      "priority": "medium",
+      "dependencies": [],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 16,
+      "title": "Implement Streaming Responses",
+      "description": "Add real-time streaming for generated answers.",
+      "details": "Modify the chat endpoint to stream responses chunk by chunk. Update the frontend to display streaming text. Handle interruptions gracefully.",
+      "testStrategy": "Test streaming with long queries and verify smooth updates.",
+      "priority": "medium",
+      "dependencies": [
+        9,
+        15
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 17,
+      "title": "Add Source Attribution Display",
+      "description": "Implement UI components for source citations.",
+      "details": "Display source document metadata and chunk context for answers. Allow users to navigate to original sources. Style citations to be non-intrusive.",
+      "testStrategy": "Verify citations are accurate and links work correctly.",
+      "priority": "low",
+      "dependencies": [
+        15
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 18,
+      "title": "Implement Authentication and Security",
+      "description": "Add user authentication and security measures.",
+      "details": "Integrate OAuth2 for authentication. Add rate limiting and security headers. Set up secrets management with Vault or similar.",
+      "testStrategy": "Test authentication flows and verify security headers are present.",
+      "priority": "medium",
+      "dependencies": [
+        2
+      ],
+      "status": "pending",
+      "subtasks": []
+    },
+    {
+      "id": 19,
+      "title": "Develop Modern Gemini-Style Web Frontend for Technical Knowledge Base RAG System",
+      "description": "Create a responsive web frontend using Vite, React, and TypeScript that integrates with the existing FastAPI backend for the Technical Knowledge Base RAG System.",
+      "details": "Implement a modern Gemini-style UI that includes the following features: (1) A PDF upload panel for users to upload documents; (2) A dedicated page that lists vectorized chunks after processing, displaying metadata and allowing users to navigate through chunks; (3) A chat interface that enables users to ask questions about the uploaded documents, utilizing the integrated Qwen generation model; (4) A toggle for dark/light themes to enhance user experience; (5) Ensure the application is dockerized for production deployment. Use Tailwind CSS for styling and Radix UI for accessible components. Ensure that the frontend communicates effectively with the FastAPI endpoints for PDF processing and chat functionalities.",
+      "testStrategy": "Verify the frontend by performing the following tests: (1) Ensure the PDF upload panel correctly uploads files and displays success/error messages; (2) Check that the vectorized chunks page displays processed chunks accurately with correct metadata; (3) Test the chat interface by asking questions and verifying that responses are generated correctly; (4) Validate the dark/light theme toggle functionality; (5) Confirm that the application builds successfully in a Docker environment and is accessible in production.",
+      "status": "pending",
+      "dependencies": [
+        4,
+        10,
+        15
+      ],
+      "priority": "high",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement PDF upload panel with drag-and-drop",
+          "description": "Create React component to upload PDF to /api/v1/documents/upload and show task id status",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 19
+        },
+        {
+          "id": 2,
+          "title": "Create vector results page",
+          "description": "Build page to display vectorized chunks for a PDF after processing, with pagination and basic metadata",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 19
+        },
+        {
+          "id": 3,
+          "title": "Design and implement sorting & scoring for vector results",
+          "description": "Research and integrate similarity score ranking; display sorted chunks; evaluate algorithm and document technical decision",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 19
+        },
+        {
+          "id": 4,
+          "title": "Implement chat interface with streaming answers",
+          "description": "Create Gemini-style chat UI; connect to /api/v1/chat endpoint; stream tokens",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 19
+        },
+        {
+          "id": 5,
+          "title": "Add dark/light theme toggle and responsive layout",
+          "description": "Use Tailwind & Radix UI to support theme switching and mobile-friendly design",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 19
+        },
+        {
+          "id": 6,
+          "title": "Dockerize and deploy frontend",
+          "description": "Create Dockerfile for Vite build, serve via nginx; add frontend service to docker-compose",
+          "details": "",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 19
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "created": "2025-06-21T14:22:11.925Z",
+    "updated": "2025-06-22T08:38:32.657Z",
+    "description": "Tasks for master context"
+  }
+}
